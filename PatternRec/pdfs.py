@@ -2,7 +2,7 @@
 import numpy as np
 
 
-class Multivariate():
+class Multivariate_Gauss():
     '''
     Multivariate Normal Distribution: N(mu, Sigma)
     Usage: >>N = Gauss.Multivariate(3) # where 3 is dimensionality
