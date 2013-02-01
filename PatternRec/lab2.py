@@ -14,19 +14,22 @@ def main():
 
     fig = plt.figure()
 
-    # Plot 1: A (red) + B (blue)
-    ax1 = fig.add_subplot(111)
-    ax1.scatter(A.samples[:,0],
-                A.samples[:,1],
-                c='r', marker='o')
-    ax1.scatter(B.samples[:,0],
-                B.samples[:,1],
-                c='b', marker='o')
-    auxPlot.plotEllipse(ax1, A.mean, A.cov, 'r')
-    auxPlot.plotEllipse(ax1, B.mean, B.cov, 'b')
+    # Plot 1a: A (red) + B (blue)
+    ax1 = fig.add_subplot(211)
+    for cls, color in [(A, 'r'), (B, 'b')]:
+        ax1.scatter(cls.samples[:, 0], cls.samples[:, 1], c=color, marker='o')
+        auxPlot.plotEllipse(ax1, cls.mean, cls.cov, color)
     ax1.axis('equal')
 
-    fig.show()
+    # Plot 1b: C (magenta), D (cyan), E (green)
+    ax2 = fig.add_subplot(212)
+    for cls, color in [(C, 'm'), (D, 'c'), (E, 'g')]:
+        ax2.scatter(cls.samples[:, 0], cls.samples[:,1], c=color, marker='o')
+        auxPlot.plotEllipse(ax2, cls.mean, cls.cov, color)
+    ax2.axis('equal')
+
+    fig.show()  # TODO: add legends
+
 
 
 

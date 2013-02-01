@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from matplotlib import cm
+from matplotlib.patches import Ellipse
 from mpl_toolkits.mplot3d import Axes3D
 from numpy import linalg
 import matplotlib
@@ -45,12 +46,23 @@ def rotate2D(A, theta):
     R = np.matrix([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
     return R * A
 
+def plotEllipse(splot, mean, cov, color=None):
+    '''Given a plot object, add an ellipse defined by mean, and coariance
+    matrices'''
+    v, w = linalg.eigh(cov)
+    u = w[0] / linalg.norm(w[0])
+    theta = np.double(np.arctan2(u[:,1], u[:,0]))
+    theta = 180 * theta / np.pi
+    ell = Ellipse(mean, v[0] ** 0.5, v[1] ** 0.5, 180 + theta, color=color)
+    ell.set_clip_box(splot.bbox)
+    ell.set_alpha(0.2)
+    splot.add_artist(ell)
 
-def plotEllipse(u, major, minor, theta=0, **kwargs):
+
+def plotEllipse2(u, major, minor, theta=0, **kwargs):
     '''Plot wrapper surrounding the patches.Ellipse artist
     Theta is measured in radians counter-clockwise from the first-axis
     '''
-    from matplotlib.pathes import Ellipse
 
     expand, alpha = False, 0.1
     if expand in kwargs:
@@ -77,12 +89,3 @@ def plotEllipse(u, major, minor, theta=0, **kwargs):
     ax.set_xlim(*corners[0])
     ax.set_ylim(*corners[1])
     matplotlib.pylab.show()
-
-
-def plotCovariance(S):
-    '''
-    Plot the ellipse implied by the covariance matrix S
-    does not check for valid covariance
-    '''
-
-    pass
