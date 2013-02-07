@@ -46,16 +46,22 @@ def rotate2D(A, theta):
     R = np.matrix([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
     return R * A
 
-def plotEllipse(splot, mean, cov, color=None):
+
+def plotEllipse(splot, mean, cov, **kwargs):
     '''Given a plot object, add an ellipse defined by mean, and coariance
     matrices'''
+    if 'alpha' in kwargs:
+        a = kwargs['alpha']
+    if 'color' in kwargs:
+        c = kwargs['color']
+
     v, w = linalg.eigh(cov)
     u = w[0] / linalg.norm(w[0])
     theta = np.double(np.arctan2(u[:,1], u[:,0]))
     theta = 180 * theta / np.pi
-    ell = Ellipse(mean, v[0] ** 0.5, v[1] ** 0.5, 180 + theta, color=color)
+    ell = Ellipse(mean, 2 * v[0] ** 0.5, 2 * v[1] ** 0.5, 180 + theta, color=c)
     ell.set_clip_box(splot.bbox)
-    ell.set_alpha(0.2)
+    ell.set_alpha(a)
     splot.add_artist(ell)
 
 

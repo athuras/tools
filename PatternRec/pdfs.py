@@ -2,7 +2,7 @@
 import numpy as np
 
 
-class Multivariate_Gauss():
+class Multivariate_Normal():
     '''
     Multivariate Normal Distribution: N(mu, Sigma)
     Usage: >>N = Gauss.Multivariate(3) # where 3 is dimensionality
@@ -33,6 +33,8 @@ class Multivariate_Gauss():
             # TODO: check that supplied cov is positive definite
             for i in cov.shape:  # Ensure supplied cov is square
                 assert i == k
+        else:
+            cov = sigma
 
         self.dim = k
         self.mean = mu
@@ -53,4 +55,4 @@ class Multivariate_Gauss():
         phi = np.subtract(x, self.mean)
         return np.double(np.double(1) / (np.double(2) * np.pi ** (self.dim / 2) *
                 np.sqrt(self.det)) * np.exp(np.double(-0.5) *
-                np.transpose(phi) * self.inv * phi))
+                phi.T * self.inv * phi))
