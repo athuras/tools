@@ -74,12 +74,11 @@ class Supervised_Classifier(object):
         else:
             splot.pcolormesh(xx, yy, Z, cmap=self.colorMap, alpha=0.1)
 
-    def confuse(self, training=True):
+    def confuse(self, training=True, normalize=True):
         '''Using the training sets of each class, compose a confusion matrix
         by calling a classification function fn'''
         def wrap(x):
             return self.classify(np.matrix(x).T)
-
         k = len(self.classes)
         cfm = np.zeros(k**2)
         cfm.resize(k, k)
@@ -90,6 +89,10 @@ class Supervised_Classifier(object):
                 z = np.apply_along_axis(wrap, 1, cls.testing)
             for c in z:
                 cfm[i, c] += 1
+
+        if normalize:
+            asums = cfm.sum(axis=1)
+            cfm = cfm / asums[:, np.newaxis]
         return cfm
 
 
@@ -194,10 +197,14 @@ class KNN_Classifier(Supervised_Classifier):
         # Unleash some of numpy with this one ...
         def kmin(arr, k):
             '''returns the indices of the k-smallest items in the array'''
-            return argpartsort(arr, k)[:k]
+            return argpartsort(arr, k, axis=0)[:k]
 
-        distances = [np.apply_along_axis(np.linalg.norm, 1, cls.training - x.T)
-                    for cls in self.classes]
+        #distances = [np.apply_along_axis(np.linalg.norm, 1, cls.training - x.T)
+        #            for cls in self.classes]
+        # This is WAY faster (at least two orders of magnitude)
+        distances = (np.sqrt(np.sum(np.multiply(cls.training - x.T,
+                                                cls.training - x.T), axis=1))
+                                                for cls in self.classes)
         idx = [kmin(i, self.k) for i in distances]
         knnMeans = [np.average(self.classes[i].training[j], 0) for i, j in enumerate(idx)]
         d2 = [(i, np.linalg.norm(x.T - j)) for i, j in enumerate(knnMeans)]
@@ -211,4 +218,4 @@ class KNN_Classifier(Supervised_Classifier):
         super(KNN_Classifier, self).iterRegion(bounds, splot, self.classify, h, **kwargs)
 
     def confuse(self):
-        super(KNN_Classifier, self).confuse(False)
+        return super(KNN_Classifier, self).confuse(False)

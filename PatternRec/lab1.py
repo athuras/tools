@@ -14,7 +14,7 @@ D = CLSF.PatternClass('D', 200, (15, 10), np.matrix(((8, 0), (0, 8))), 'y')
 E = CLSF.PatternClass('E', 150, (10, 5), np.matrix(((10, -5), (-5, 20))), 'g')
 
 # Region Plotting Boundaries
-CaseBounds = {1: ((-5, 20), (0, 25)), 2: ((-5, 30), (-10, 25))}
+CaseBounds = {1: ((-5, 20), (0, 25)), 2: ((-5, 0), (-10, 25))}
 g1, g2 = (A, B), (C, D, E)
 
 
@@ -28,24 +28,24 @@ def main():
     med1 = CLSF.MED_Classifier(g1)
     map1 = CLSF.MAP_Classifier(g1)
     gem1 = CLSF.GEM_Classifier(g1)
-    showBoundaries((med1, map1, gem1), CaseBounds[1])
+    #    showBoundaries((med1, map1, gem1), CaseBounds[1])
 
     # Group 2
     med2 = CLSF.MED_Classifier(g2)
     map2 = CLSF.MAP_Classifier(g2)
     gem2 = CLSF.GEM_Classifier(g2)
-    showBoundaries((med2, map2, gem2), CaseBounds[2])
+    #   showBoundaries((med2, map2, gem2), CaseBounds[2])
 
     # Show KNN for k in (1, 5) ################################################
     # Group 1
     nn1 = CLSF.KNN_Classifier(g1, 1)
     knn1 = CLSF.KNN_Classifier(g1, 5)
-    showNNBoundaries((nn1, knn1), CaseBounds[1])
+    #   showNNBoundaries((nn1, knn1), CaseBounds[1])
 
     # Group 2
     nn2 = CLSF.KNN_Classifier(g2, 1)
     knn2 = CLSF.KNN_Classifier(g2, 5)
-    showNNBoundaries((nn2, knn2), CaseBounds[2])
+    #   showNNBoundaries((nn2, knn2), CaseBounds[2])
 
     # Error Analysis ##########################################################
     print "Confusion Matrices:"
