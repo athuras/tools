@@ -22,15 +22,16 @@ class PatternClass(object):
         Adds the scatter of training points, and the unit-deviation ellipse to
         the plot provided.
         '''
-        color = None
         marker = 'o'
-        if 'color' in kwargs:
-            color = kwargs['color']
+        ellipse = True
         if 'marker' in kwargs:
             marker = kwargs['marker']
+        if 'ellipse' in kwargs:
+            ellipse = kwargs['ellipse']
 
-        splot.scatter(self.training[:, 0], self.training[:, 1], c=color, marker=marker)
-        auxPlot.plotEllipse(splot, self.mean, self.cov, color=color, alpha=0.5)
+        splot.scatter(self.training[:, 0], self.training[:, 1], c=self.colorCode, marker=marker)
+        if ellipse:
+            auxPlot.plotEllipse(splot, self.mean, self.cov, color=self.colorCode, alpha=0.35)
 
     def bounds(self, training=True):
         '''Return the corners of the bounding box of the training/testing set'''
@@ -50,7 +51,7 @@ class Supervised_Classifier(object):
 
     def classify(self, x):
         '''Naive classification, overload this!'''
-        return None
+        return 0
 
     def iterRegion(self, bounds, splot, fn, h, **kwargs):
         '''Execute fn across region, spray result to a splot object:
@@ -72,6 +73,24 @@ class Supervised_Classifier(object):
             splot.contour(xx, yy, Z, cmap=self.colorMap, linewidth=1)
         else:
             splot.pcolormesh(xx, yy, Z, cmap=self.colorMap, alpha=0.1)
+
+    def confuse(self, training=True):
+        '''Using the training sets of each class, compose a confusion matrix
+        by calling a classification function fn'''
+        def wrap(x):
+            return self.classify(np.matrix(x).T)
+
+        k = len(self.classes)
+        cfm = np.zeros(k**2)
+        cfm.resize(k, k)
+        for i, cls in enumerate(self.classes):
+            if training:
+                z = np.apply_along_axis(wrap, 1, cls.training)
+            else:
+                z = np.apply_along_axis(wrap, 1, cls.testing)
+            for c in z:
+                cfm[i, c] += 1
+        return cfm
 
 
 class MED_Classifier(Supervised_Classifier):
@@ -153,8 +172,7 @@ class MAP_Classifier(Supervised_Classifier):
     def classify(self, x):
         '''Fit x to one of the classes in the classifier'''
         ps = [(k, i[1] * i[2].evaluate(x)) for k, i in enumerate(self.tdata)]
-        ps.sort(key=lambda z: z[1], reverse=True)
-        return ps[0][0]
+        return max(ps, key=lambda z: z[1])[0]
 
     def showRegions(self, bounds, splot, h=0.1, **kwargs):
         '''Draws shaded regions over the bounds given. If mode is none,
@@ -191,3 +209,6 @@ class KNN_Classifier(Supervised_Classifier):
         draws nice shaded regions, otherwise gives the (you guessed it) contour
         '''
         super(KNN_Classifier, self).iterRegion(bounds, splot, self.classify, h, **kwargs)
+
+    def confuse(self):
+        super(KNN_Classifier, self).confuse(False)

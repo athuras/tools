@@ -29,8 +29,7 @@ class Multivariate_Normal():
         if sigma is None:
             cov = np.matrix(np.identity(k, dtype=dataType))
         elif type(sigma) is not np.matrix:
-            cov = np.matrix(cov, dtype=dataType)
-            # TODO: check that supplied cov is positive definite
+            cov = np.matrix(sigma, dtype=dataType)
             for i in cov.shape:  # Ensure supplied cov is square
                 assert i == k
         else:
