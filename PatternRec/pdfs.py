@@ -16,10 +16,7 @@ class Multivariate_Normal():
         and optional means, and/or covariance matrix.
         dataType defaults to np.double
         '''
-        if 'dataType' not in kwargs:
-            dataType = np.double
-        else:
-            dataType = kwargs['dataType']
+        dataType = kwargs.get('dataType', np.double)
 
         if mu is None:
             mu = np.transpose(np.matrix(np.zeros(k, dtype=dataType)))
@@ -55,3 +52,41 @@ class Multivariate_Normal():
         return np.double(np.double(1) / (np.double(2) * np.pi ** (self.dim / 2) *
                 np.sqrt(self.det)) * np.exp(np.double(-0.5) *
                 phi.T * self.inv * phi))
+
+class Exponential(object):
+    '''Univariate Exponential Distribution on a scalar x'''
+    def __init__(self, l, **kwargs):
+        self.l = l
+
+    def evaluate(self, x):
+        if x < 0:
+            return 0
+        else:
+            return self.l * np.exp(-self.l * x)
+
+class Uniform(object):
+    '''Multivariate Uniform Distribution'''
+    def __init__(self, bounds):
+        '''Bounds is an array-like object containing dimensionally ranked
+        min/max pairs.
+        For example, a unit square:
+            Uniform(np.array([[0, 1], [0, 1]]))
+        '''
+        self.bounds = bounds
+        self.value = 1 / np.product(np.max(bounds, axis=0) -
+                                np.min(bounds, axis=0), dtype=np.double)
+
+    def in_bounds(self, x):
+        '''Slow for now, will implement in boolean array eventually'''
+        for i, v in enumerate(x):
+            if self.bounds[i*2] <= v <= self.bounds[i*2 + 1]:
+                continue
+            else:
+                return False
+        return True
+
+    def evaluate(self, x):
+        if self.in_bounds(x):
+            return self.value
+        else:
+            return 0.
