@@ -14,7 +14,7 @@ def boundingPrism(A, ax=0):
     return zip(A.min(ax), A.max(ax))
 
 
-def plot2d(fn, bounds, dx=0.1):
+def plot3d(fn, bounds, dx=0.1):
     '''
     Uses pylab to plot the a scalar function of up to two variables
     argument examples:

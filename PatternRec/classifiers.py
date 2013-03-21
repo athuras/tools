@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+#
+# Implementations of supervised classifiers in python
+# Enjoy! -Alexander Huras
+
+
 from bottleneck import argpartsort  # For KNN
 from matplotlib.colors import ListedColormap
 from pdfs import Multivariate_Normal
@@ -58,12 +63,11 @@ class Supervised_Classifier(object):
         fn is passed a column vector'''
         xx, yy = np.meshgrid(np.arange(bounds[0][0], bounds[0][1], h),
                              np.arange(bounds[1][0], bounds[1][1], h))
-        Z = np.zeros((len(xx), len(yy)))
         xn, yn = xx.shape
+        Z = np.zeros(xx.shape)
         for ix in xrange(xn):
             for iy in xrange(yn):
                 Z[ix, iy] = fn(np.c_[xx[ix, iy], yy[ix, iy]].T)
-        Z.reshape(xx.shape)
 
         mode = None
         if 'mode' in kwargs:
@@ -219,3 +223,13 @@ class KNN_Classifier(Supervised_Classifier):
 
     def confuse(self):
         return super(KNN_Classifier, self).confuse(False)
+
+class ML_Classifier(object):
+    '''Houses logic to classify based on anything which returns a probability
+    with obj.evaluate(vector).'''
+    def __init__(self, pdfs):
+        self.pdfs = pdfs
+
+    def classify(self, x):
+        return max([(f.evaluate(x), i) for i, f in enumerate(self.pdfs)],
+                    key=lambda z: z[0])[1]

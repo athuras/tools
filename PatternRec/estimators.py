@@ -9,7 +9,7 @@ def main():
 
 def multivariate_normal(data, dim, **kwargs):
     ''''Return the ML multivariate normal distribution object'''
-    u, S = matrix(np.mean(data, axis=1)), matrix(np.cov(data))
+    u, S = matrix(np.mean(data, axis=0)), matrix(np.cov(data))
     return pdfs.Multivariate_Normal(dim, u, S)
 
 def univariate_exponential(data, **kwargs):
@@ -19,8 +19,8 @@ def univariate_exponential(data, **kwargs):
 
 def multivariate_uniform(data, **kwargs):
     '''Returns the multivariate uniform distribution object.'''
-    b = np.min(data, axis=1)
-    b = np.append(b, np.max(data, axis=1))
+    b = np.min(data, axis=0)
+    b = np.append(b, np.max(data, axis=0))
     return pdfs.Uniform(b)
 
 class KDE(object):
@@ -34,7 +34,7 @@ class KDE(object):
     def evaluate(self, x):
         '''Slow as balls with the GIL, but for a one-liner, its expected'''
         # Stick this in your pipe and smoke it.
-        return sum(map(lambda y: y.evaluate(x.T), self.kernels)) / float(len(self.kernels))
+        return sum(map(lambda y: y.evaluate(x), self.kernels)) / float(len(self.kernels))
 
 if __name__ == '__main__':
     main()
