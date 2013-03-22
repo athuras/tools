@@ -10,7 +10,7 @@ import seq
 
 RES = 5
 fig_count = 0
-debug = [4]
+debug = range(5)
 
 def main():
     global fig_count
