@@ -29,7 +29,6 @@ class fast_MED(object):
         [results, confusion] = confuse(stuff)
         '''
         if len(points) != labels.size:
-            print points, labels
             raise AssertionError
         k = len(self.prototypes)
         results = self.classify(points)
@@ -49,14 +48,15 @@ class seq_Linear(object):
         self.data = data
         self.labels = labels
         self.classifiers = []
+        self.attempts = 0
 
-    def iter_train(self):
+    def iter_train(self, max_cls=100):
         '''Thrashes until it linearly separates points, this will hit the
         iter_limit (and break) if training points are not linearly separable'''
         # Wastes a little memory here, but whose counting?
 
         def remove_idx(state, idx):
-            return [np.delete(z, idx) for z in state]
+            return [np.delete(z, idx, axis=0) for z in state]
 
         def get_prototype(state, prots = (0, 1)):
             '''Randomly select a list of vector prototypes from state'''
@@ -67,38 +67,42 @@ class seq_Linear(object):
 
         unres = [np.copy(self.data), np.copy(self.labels)]
         sequence = []
-
+        current_iteration = None
         for current_iteration in xrange(self.ITER_LIMIT):
+            if unres[0].size == 0:
+                break
             G = fast_MED(get_prototype(unres, (0, 1)))
-            print [z.shape for z in unres]
             results, C = G.confuse(unres[0], unres[1])
             if C[0,1] != 0 and C[1,0] != 0:
                 continue
 
             R = []
-            strength = []
             if C[0,1] == 0:
                 R.append(np.where(results == 1)[0])
-                strength.append(1)
             if C[1,0] == 0:
                 R.append(np.where(results == 0)[0])
-                strength.append(0)
             R = np.concatenate(R)
             unres = remove_idx(unres, R)
-            sequence.append((G, sorted(strength)))
-            print sequence, current_iteration
+            sequence.append((G, C))
+            if len(sequence) >= max_cls:
+                break
 
         self.classifiers = sequence
+        self.attempts = current_iteration
+
 
     def classify(self, x):
         '''Run down the sequence, could return horrible horrible things if
         not linearly seperable. This is sadly NOT array-native, also only takes a
         SINGLE vector'''
-        for clsf, valid in self.classifiers:
+        rt = None
+        for clsf, C in self.classifiers:
             rt = clsf.classify(x)
-            if int(rt) in valid:
+            if (rt == 0 and C[1,0] == 0) or (rt == 1 and C[0,1] == 0):
                 return rt
-        return None
+            else:
+                continue
+        return rt  # Degenerates with non-perfect assesment
 
     def iterRegion(self, bounds, splot, h=1, **kwargs):
         xx, yy = np.meshgrid(np.arange(bounds[0][0], bounds[0][1], h),
@@ -107,10 +111,20 @@ class seq_Linear(object):
         Z = np.zeros(xx.shape)
         for ix in xrange(xn):
             for iy in xrange(yn):
-                Z[ix, iy] = self.classify(np.c_[xx[ix, iy], yy[ix, iy]].T)
+                Z[ix, iy] = self.classify(np.c_[xx[ix, iy], yy[ix, iy]])
         splot.contour(xx, yy, Z)
         return splot
 
+    def fit_performance(self):
+        '''Returns (incorrect_count, total_count)'''
+        assert len(self.classifiers) > 0
+        total = np.sum(self.classifiers[0][1])
+        incorrect = (np.sum(self.classifiers[-1][1]) -
+                     np.trace(self.classifiers[-1][1]))
+        return incorrect, total
+
+    def confuse(self, data, labels):
+        pass
 
 
 if __name__ == '__main__':

@@ -45,8 +45,6 @@ class Multivariate_Normal():
         return np.double
         enforces len(x) == k
         '''
-        if type(x) is not np.matrix:
-            x = np.matrix(x, dtype=self.dtype)
 
         phi = np.subtract(x, self.mean)
         return np.double(np.double(1) / (np.double(2) * np.pi ** (self.dim / 2) *
