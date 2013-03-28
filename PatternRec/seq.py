@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-# Lets try to follow the convention of having everything as an array operation
 import numpy as np
 
 
