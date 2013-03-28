@@ -18,13 +18,13 @@ class MICD(object):
 
     def classify(self, points):
         '''YOLO'''
-        Z = points[:, np.newaxis] - self.class_means
-        Q = (Z[:,:,None] * self.class_invs).sum(axis=3)
+        Z = points[..., None] - self.class_means.T
+        Q = (Z[...,None] * self.class_invs.swapaxes(1, 2)).sum(axis=3)
         return np.argmin((Q * Z).sum(axis=1), axis=1)
 
     def confuse(self, points, labels):
         assert len(points) == labels.size
-        k = self.class_means.shape[1]
+        k = self.class_means.shape[0]
         results = self.classify(points)
         return np.bincount(k * labels + results, minlength=k*k).reshape(k, k)
 
@@ -35,13 +35,13 @@ class MED(object):
         self.prototypes = prototypes
 
     def classify(self, points):
-        Z = points[:, np.newaxis] - self.prototypes
+        Z = points[..., np.newaxis] - self.prototypes
         Q = np.multiply(Z, Z).sum(axis=1)
         return np.argmin(Q, axis=1)
 
     def confuse(self, points, labels):
         assert len(points) == labels.size
-        k = self.prototypes.shape[1]
+        k = self.prototypes.shape[2]
         results = self.classify(points)
         return np.bincount(k * labels + results, minlength=k*k).reshape(k, k)
 
