@@ -37,7 +37,7 @@ class MICD(object):
     def classify(self, points):
         '''YOLO'''
         Z = points[..., None] - self.class_means.T
-        R = ((Z[:, None] * self.class_invs).sum(axis=2) * Z).sum(axis=1)
+        R = ((Z[:,:, None] * self.class_invs).sum(axis=1) * Z).sum(axis=1)
         return np.argmin(R, axis=1)
 
     def confuse(self, points, labels):
