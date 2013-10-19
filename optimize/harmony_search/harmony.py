@@ -3,17 +3,27 @@ import random
 import heapq as H
 
 class pTuple(tuple):
-    '''Subclass of tuple where '>' and '<' only look at the first element,
-    useful in a heapq list.'''
+    '''
+    Subclass of tuple where '>' and '<' only look at the first element,
+    useful in a heapq list.
+
+    This was necessary for the implementation in HarmonySearch, wherein the
+    'data' for each heap element was implicitely being compared (which becomes
+    annoying for np.array).
+    '''
     def __lt__(self, other):
         return self[0] < other[0]
     def __gt__(self, other):
         return self[0] > other[0]
 
 class HarmonySearch(object):
-    '''Harmony Search without fret width discretization, set to Maximise'''
+    '''
+    The Harmony Search Hill-Climbing algorithm,
+    without fret width discretization
+    '''
     def __init__(self, f, bounds, constraints=[], hms=10, **kwargs):
-        '''Set the various parameters for the Harmony Search Metaheuristic
+        '''
+        Set the various parameters for the Harmony Search Metaheuristic
         Optimization Method.
         * f: the objective function to be MAXIMISED. input should be a 1xN array
         * bounds: the region to be explored i.e. ((-10, 10), (10, 20)).
@@ -62,6 +72,7 @@ class HarmonySearch(object):
 
     @staticmethod
     def alternator(i=True):
+        '''Yeeeeeeeehaw!'''
         while True:
             yield i
             i = not i
@@ -70,8 +81,11 @@ class HarmonySearch(object):
         return [self.random_selection_as_array() for i in xrange(self.hms)]
 
     def next_note(self):
-        '''Decide which 'note' to play next probabilistically,
-        returns (f(n), n) tuple.'''
+        '''
+        Decide which 'note' to play next probabilistically,
+        returns (f(n), n) pTuple.
+        See harmony.pTuple for details.
+        '''
         d = random.uniform(0., 1.)
         if d > self.hmcr:
             s = self.random_selection_as_array()
