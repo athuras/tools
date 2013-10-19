@@ -70,7 +70,7 @@ using Harmony Search
         ax.set_title(names[i])
 
 
-![png](https://raw.github.com/athuras/tools/master/optimize/harmony_search/https://raw.github.com/athuras/tools/master/optimize/harmony_search/README_files//README_6_0.png)
+![png](https://raw.github.com/athuras/tools/master/optimize/harmony_search/https://raw.github.com/athuras/tools/master/optimize/harmony_search/README_files/README_6_0.png)
 
 
 ## Enter Harmony Search!
