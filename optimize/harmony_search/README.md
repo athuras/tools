@@ -11,7 +11,7 @@ using Harmony Search
     import matplotlib
     import matplotlib.pyplot as plt
 
-    
+
     Welcome to pylab, a matplotlib-based Python environment [backend: module://IPython.zmq.pylab.backend_inline].
     For more information, type 'help(pylab)'.
 
@@ -26,16 +26,16 @@ using Harmony Search
         c = 10 * (1 - 1. / (8 * np.pi))
         return (((x[:, 1] - a) * x[:, 0]**2. + x[:, 0] * b - 6.)**2.
                + np.cos(x[:, 0]) * c + 10)
-    
+
     def griewank(x, fr=4000):
         '''Vectorized Griewank'''
         s = np.square(x).sum(axis=1)
         p = np.ones_like(s)
         for j in xrange(x.shape[1]):
             p *= np.cos(x[:, j] / np.sqrt(j + 1))
-        
+
         return s / fr - p + 1
-        
+
     def mich(x, m=10):
         '''Vectorized Michalewicz Function'''
         m = 10;
@@ -70,7 +70,7 @@ using Harmony Search
         ax.set_title(names[i])
 
 
-![png](README_files/README_6_0.png)
+![png](https://raw.github.com/athuras/tools/master/optimize/harmony_search/https://raw.github.com/athuras/tools/master/optimize/harmony_search/README_files//README_6_0.png)
 
 
 ## Enter Harmony Search!
@@ -89,7 +89,7 @@ run a kmeans clustering routine to find the best solutions.
 
 
     # Invert the signals to use hill-climbing HS.
-    funs = (lambda q: -branin(q), 
+    funs = (lambda q: -branin(q),
             lambda q: -griewank(q),
             lambda q: -mich(q))
     trials = 150
@@ -106,6 +106,6 @@ run a kmeans clustering routine to find the best solutions.
 
 
 
-![png](README_files/README_9_0.png)
+![png](https://raw.github.com/athuras/tools/master/optimize/harmony_search/README_files/README_9_0.png)
 
 
