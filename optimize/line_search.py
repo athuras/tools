@@ -22,7 +22,7 @@ def als(f, x0, grad_0, alpha0=1., beta=0.95, sigma=0.1, **kwargs):
     d = -grad_0.dot(np.c_[dx / np.linalg.norm(dx)])
 
     i = 0
-    while f(x0 + t*grad_0) > f_x0 + sigma * t * d:
+    while f(x0 + t*d) > sigma * t * np.dot(d.T, grad_0) + f_x0:
         if i > maxiter:
             break
         elif t < 10 * np.finfo(np.float).eps:
