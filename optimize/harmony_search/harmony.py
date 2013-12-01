@@ -16,6 +16,12 @@ class pTuple(tuple):
     def __gt__(self, other):
         return self[0] > other[0]
 
+def in_bounds(bounds, x):
+    for i, e in enumerate(x):
+        if not bounds[i][0] <= e <= bounds[i][1]:
+            return False
+    return True
+
 class HarmonySearch(object):
     '''
     The Harmony Search Hill-Climbing algorithm,
@@ -54,7 +60,8 @@ class HarmonySearch(object):
         self.hms = hms  # Harmony Memory Size
         self.constraints = constraints
         self.bounds = bounds
-        self.hm = None
+        self.constraints.append(lambda x: in_bounds(self.bounds, x[1]))
+        self.hm = []
         self.f = f
 
         # Additional Parameters
@@ -68,7 +75,7 @@ class HarmonySearch(object):
         return [random.uniform(i[0], i[1]) for i in self.bounds]
 
     def random_selection_as_array(self):
-        return  np.hstack(self.random_selection())
+        return  np.array(self.random_selection())
 
     @staticmethod
     def alternator(i=True):
@@ -86,6 +93,10 @@ class HarmonySearch(object):
         returns (f(n), n) pTuple.
         See harmony.pTuple for details.
         '''
+        if len(self.hm) < self.hms:
+            s = self.random_selection_as_array()
+            return pTuple((self.f(s[None, :]), s))
+
         d = random.uniform(0., 1.)
         if d > self.hmcr:
             s = self.random_selection_as_array()
@@ -103,14 +114,14 @@ class HarmonySearch(object):
             return self.hm[z]
 
     def execute(self):
-        init_hm = self.initial_improvise()
-        hm = [pTuple((self.f(i[None, :]), i)) for i in init_hm]
-        H.heapify(hm)
-        self.hm = hm
-
         for i in xrange(self.max_iter):
             n = self.next_note()
-            if (n[0] >= self.hm[0][0] and all(z(n) for z in self.constraints)):
+            if not all(z(n) for z in self.constraints):
+                continue
+
+            if len(self.hm) < self.hms:
+                H.heappush(self.hm, n)
+            elif n[0] >= self.hm[0][0]:
                 _ = H.heappushpop(self.hm, n)
 
         return max(self.hm, key=lambda x: x[0])[1]
