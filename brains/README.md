@@ -1,4 +1,4 @@
-# Computation Neuroscience-Related projects and assigments
+# Computational Neuroscience-Related projects and assigments
 
 ## SYDE 556 - Simulating Neurobiological Systems
 I'm going to try to do all the assignments in Julia, we'll see how that goes.
