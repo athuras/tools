@@ -28,6 +28,16 @@ function lif_fit(x_max, x_int, y_max, enc, t_ref=0.002, t_rc=0.02)
     return cat(2, alpha, bias)
 end
 
+# Calculate Params
+function dual_point_lif_fit(x, a; t_ref=0.002, t_rc=0.02)
+    const eps = t_rc / t_ref
+    r = 1. / (t_ref .* a)
+    f = (r .- 1) ./ eps
+    alpha = (1. / exp(f[2]) - 1) - 1. / (exp(f[1]) - 1) ./ (x[2] - x[1])
+    x_threshold = x[1] - 1 ./ (alpha * exp(f[2]) - 1)
+    Jbias = 1 - alpha .* x_threshold
+    return [alpha Jbias]
+end
 
 # linear tuning fit
 # returns an array of alpha, bias terms, one for each of x_max
@@ -52,7 +62,7 @@ function lif_sim(x::Array{Float64},
                  dt::Float64,
                  encoders::Array{Float64},
                  params::Array{Float64};
-                 t_ref=0.02, t_rc=0.002, spike_ref=1.)
+                 t_ref=0.002, t_rc=0.02, spike_ref=1.)
     const k = size(x, 1)
     const n = size(params, 1)
     refractory_steps = int(t_ref / dt)  # BEWARE roundoff error
@@ -70,8 +80,8 @@ function lif_sim(x::Array{Float64},
         spikes = V_sim[:, i] .> 1.
         V_sim[spikes, i] = spike_ref  # Set the spikes to the reference value
         V_sim[:, i] = max(V_sim[:, i], 0)  # because shenanigans happened before ...
-        ref_state[spikes] = refractory_steps  # Set the spike counters
         ref_state -= 1
+        ref_state[spikes] = refractory_steps  # Set the spike counters
     end
     return V_sim  # The voltage 'chart' one row-per-neuron.
 end
