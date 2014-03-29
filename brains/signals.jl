@@ -2,7 +2,8 @@ module Signals
 
 import Kernels: ideal_LPF
 
-export rms, rescale_rms, wgn_coeffs, mask_coeffs, gen_wgn_signal
+export rms, rescale_rms, wgn_coeffs, mask_coeffs
+export gen_wgn_signal, wgn_signal
 
 rms(x) = sqrt((1. / prod(size(x))) * sum(x .* x))
 rescale_rms(x, z::Real) = (z / rms(x)) .* x
@@ -18,6 +19,14 @@ function gen_wgn_signal(T::Real, dt::Real, rms_power::Real,
     coeffs = mask_coeffs(freqs, coeffs, mask_fn, mask_params...)
     x = irfft(coeffs, n)  # Shenanigans with the size ...
     return rescale_rms(x, rms_power)
+end
+
+# Multi-dimensional version of gen_wgn_signal
+function wgn_signal(d::Integer, T, dt, rms=Real;
+        mask_fn::Function=ideal_LPF, mask_params=[15])
+    z = [gen_wgn_signal(T, dt, rms, mask_fn, mask_params...)'
+            for i in 1:d]
+    return cat(1, z...)
 end
 
 # Return the frequencies, and fourier coefficients of white noise spectrum

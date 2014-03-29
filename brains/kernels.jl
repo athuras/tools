@@ -1,5 +1,5 @@
 module Kernels
-export ideal_LPF, gaussian_LPF
+export ideal_LPF, gaussian_LPF, psc_filter
 
 # Returns multiplicative mask. Suitable for application on
 # a half-fourier coefficient array.
@@ -16,4 +16,6 @@ function gaussian_LPF(freqs, bandwidth)
     k = exp(-(freqs .* freqs) ./ (cutoff * cutoff))
     return k
 end
+
+psc_filter(t, n, tau) = (z = t.^n .* exp(-t ./ tau); z ./ sum(z))
 end
